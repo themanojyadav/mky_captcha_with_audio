@@ -1,0 +1,55 @@
+<?php
+
+namespace Mky\CaptchaWithAudio;
+
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Validator;
+use Mky\CaptchaWithAudio\CaptchaValidator as CaptchaValidatorClass;
+
+class CaptchaServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        $this->app->singleton('mky-captcha', function ($app) {
+            return new CaptchaGenerator();
+        });
+
+        $this->mergeConfigFrom(
+            __DIR__ . '/config/mky-captcha.php',
+            'mky-captcha'
+        );
+    }
+
+    public function boot(): void
+    {
+        // Publish config
+        $this->publishes([
+            __DIR__ . '/config/mky-captcha.php' => config_path('mky-captcha.php'),
+        ], 'mky-captcha-config');
+
+        // Publish audio files
+        $this->publishes([
+            __DIR__ . '/../resources/audio' => public_path('vendor/mky-captcha/audio'),
+        ], 'mky-captcha-audio');
+
+        // Load routes
+        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+
+        // Load views
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'mky-captcha');
+
+        // Publish views
+        $this->publishes([
+            __DIR__ . '/../resources/views' => resource_path('views/vendor/mky-captcha'),
+        ], 'mky-captcha-views');
+
+        // Register custom validation rule
+        Validator::extend('mky_captcha', function ($attribute, $value, $parameters, $validator) {
+            return app(CaptchaValidatorClass::class)->validate($value);
+        });
+
+        Validator::replacer('mky_captcha', function ($message, $attribute, $rule, $parameters) {
+            return str_replace(':attribute', $attribute, 'The :attribute is invalid.');
+        });
+    }
+}
