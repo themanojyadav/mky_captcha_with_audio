@@ -32,6 +32,22 @@ class CaptchaServiceProvider extends ServiceProvider
             __DIR__ . '/../resources/audio' => public_path('vendor/mky-captcha/audio'),
         ], 'mky-captcha-audio');
 
+        // Publish CSS
+        $this->publishes([
+            __DIR__ . '/../resources/css' => public_path('vendor/mky-captcha/css'),
+        ], 'mky-captcha-css');
+
+        // Publish JavaScript
+        $this->publishes([
+            __DIR__ . '/../resources/js' => public_path('vendor/mky-captcha/js'),
+        ], 'mky-captcha-js');
+
+        // Publish assets (CSS + JS)
+        $this->publishes([
+            __DIR__ . '/../resources/css' => public_path('vendor/mky-captcha/css'),
+            __DIR__ . '/../resources/js' => public_path('vendor/mky-captcha/js'),
+        ], 'mky-captcha-assets');
+
         // Load routes
         $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
 

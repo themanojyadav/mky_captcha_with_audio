@@ -64,6 +64,12 @@ Publish the configuration file:
 php artisan vendor:publish --tag=mky-captcha-config
 ```
 
+Publish the CSS and JavaScript files:
+
+```bash
+php artisan vendor:publish --tag=mky-captcha-assets
+```
+
 Publish the audio files directory:
 
 ```bash
@@ -81,6 +87,14 @@ Or publish everything at once:
 ```bash
 php artisan vendor:publish --provider="Mky\CaptchaWithAudio\CaptchaServiceProvider"
 ```
+
+This will create:
+
+- `config/mky-captcha.php` - Configuration file
+- `public/vendor/mky-captcha/css/mky-captcha.css` - Styles
+- `public/vendor/mky-captcha/js/mky-captcha.js` - JavaScript
+- `public/vendor/mky-captcha/audio/` - Audio files directory
+- `resources/views/vendor/mky-captcha/` - Blade views (optional)
 
 ### Step 3: Add Audio Files
 
