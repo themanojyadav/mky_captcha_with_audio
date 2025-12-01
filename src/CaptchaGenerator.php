@@ -110,7 +110,7 @@ class CaptchaGenerator
     protected function addText($image, string $code, int $width, int $height): void
     {
         $textColor = config('mky-captcha.text_color', [0, 0, 0]);
-        $fontSize = config('mky-captcha.font_size', 20);
+        $fontSize = config('mky-captcha.font_size', 32);
         $angleMin = config('mky-captcha.angle_min', -15);
         $angleMax = config('mky-captcha.angle_max', 15);
         $color = sprintf('rgb(%d, %d, %d)', $textColor[0], $textColor[1], $textColor[2]);
@@ -120,11 +120,12 @@ class CaptchaGenerator
 
         for ($i = 0; $i < $codeLength; $i++) {
             $x = (int)(($i + 1) * $spacing);
-            $y = (int)($height / 2) + random_int(-5, 5);
+            $y = (int)($height / 2) + random_int(-8, 8);
             $angle = random_int($angleMin, $angleMax);
 
+            // Use larger font size directly
             $image->text($code[$i], $x, $y, function ($font) use ($fontSize, $color, $angle) {
-                $font->size($fontSize);
+                $font->size($fontSize * 2); // Multiply by 2 for better visibility
                 $font->color($color);
                 $font->align('center');
                 $font->valign('middle');
