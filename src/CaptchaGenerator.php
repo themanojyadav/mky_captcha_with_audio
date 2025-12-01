@@ -124,7 +124,6 @@ class CaptchaGenerator
             $angle = random_int($angleMin, $angleMax);
 
             $image->text($code[$i], $x, $y, function ($font) use ($fontSize, $color, $angle) {
-                $font->filename(null); // Use default font
                 $font->size($fontSize);
                 $font->color($color);
                 $font->align('center');
