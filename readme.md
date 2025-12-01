@@ -41,7 +41,7 @@ Or add it manually to your `composer.json`:
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/YOUR-USERNAME/mky-captcha-with-audio"
+      "url": "https://github.com/themanojyadav/mky_captcha_with_audio"
     }
   ],
   "require": {
@@ -620,7 +620,7 @@ If you find this package helpful, please consider giving it a ⭐ on GitHub!
 
 ## 📧 Issues
 
-For bug reports and feature requests, please use the [GitHub Issues](https://github.com/YOUR-USERNAME/mky-captcha-with-audio/issues) page.
+For bug reports and feature requests, please use the [GitHub Issues](https://github.com/themanojyadav/mky_captcha_with_audio/issues) page.
 
 ---
 
