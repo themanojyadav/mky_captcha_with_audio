@@ -23,6 +23,7 @@
       const token = document.querySelector('meta[name="csrf-token"]')?.content;
       const response = await fetch(refreshUrl, {
         method: "POST", // ✅ use POST for CSRF-protected routes
+        credentials: "same-origin",
         headers: {
           "X-CSRF-TOKEN": token,
           Accept: "application/json",

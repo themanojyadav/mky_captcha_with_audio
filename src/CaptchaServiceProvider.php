@@ -42,6 +42,11 @@ class CaptchaServiceProvider extends ServiceProvider
             __DIR__ . '/../resources/js' => public_path('vendor/mky-captcha/js'),
         ], 'mky-captcha-js');
 
+        // Publish font
+        $this->publishes([
+            __DIR__ . '/../resources/fonts' => public_path('vendor/mky-captcha/fonts'),
+        ], 'mky-captcha-fonts');
+
         // Publish assets (CSS + JS)
         $this->publishes([
             __DIR__ . '/../resources/css' => public_path('vendor/mky-captcha/css'),

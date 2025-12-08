@@ -35,7 +35,7 @@ return [
 
     // Font settings
     'font_size' => 40,
-    'font_path' => base_path('resources/fonts/roboto_variable.ttf'),
+    'font_path' => 'vendor/mky-captcha/fonts/roboto_variable.ttf',
     'angle_min' => -15, // Minimum character rotation angle
     'angle_max' => 15, // Maximum character rotation angle
 
