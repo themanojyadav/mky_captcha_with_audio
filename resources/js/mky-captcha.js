@@ -20,8 +20,15 @@
         console.error("Refresh URL not found");
         return;
       }
-
-      const response = await fetch(refreshUrl);
+      const token = document.querySelector('meta[name="csrf-token"]')?.content;
+      const response = await fetch(refreshUrl, {
+        method: "POST", // ✅ use POST for CSRF-protected routes
+        headers: {
+          "X-CSRF-TOKEN": token,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
       const data = await response.json();
 
       if (data.success) {

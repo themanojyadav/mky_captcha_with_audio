@@ -34,7 +34,8 @@ return [
     'noise_dots' => 50, // Number of noise dots
 
     // Font settings
-    'font_size' => 20,
+    'font_size' => 40,
+    'font_path' => base_path('resources/fonts/roboto_variable.ttf'),
     'angle_min' => -15, // Minimum character rotation angle
     'angle_max' => 15, // Maximum character rotation angle
 

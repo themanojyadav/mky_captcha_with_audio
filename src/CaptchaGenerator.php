@@ -110,22 +110,26 @@ class CaptchaGenerator
     protected function addText($image, string $code, int $width, int $height): void
     {
         $textColor = config('mky-captcha.text_color', [0, 0, 0]);
-        $fontSize = config('mky-captcha.font_size', 32);
+        $fontSize  = config('mky-captcha.font_size', 40); // ✅ Larger & clean
         $angleMin = config('mky-captcha.angle_min', -15);
         $angleMax = config('mky-captcha.angle_max', 15);
+
         $color = sprintf('rgb(%d, %d, %d)', $textColor[0], $textColor[1], $textColor[2]);
+
+        // ✅ Correct absolute font path
+        $fontPath = config('mky-captcha.font_path');
 
         $codeLength = strlen($code);
         $spacing = $width / ($codeLength + 1);
 
         for ($i = 0; $i < $codeLength; $i++) {
             $x = (int)(($i + 1) * $spacing);
-            $y = (int)($height / 2) + random_int(-8, 8);
+            $y = (int)($height * 0.7) + random_int(-5, 5);
             $angle = random_int($angleMin, $angleMax);
 
-            // Use larger font size directly
-            $image->text($code[$i], $x, $y, function ($font) use ($fontSize, $color, $angle) {
-                $font->size($fontSize * 2); // Multiply by 2 for better visibility
+            $image->text($code[$i], $x, $y, function ($font) use ($fontPath, $fontSize, $color, $angle) {
+                $font->file($fontPath);
+                $font->size($fontSize);
                 $font->color($color);
                 $font->align('center');
                 $font->valign('middle');
@@ -133,6 +137,7 @@ class CaptchaGenerator
             });
         }
     }
+
 
     /**
      * Get audio files for the current CAPTCHA
