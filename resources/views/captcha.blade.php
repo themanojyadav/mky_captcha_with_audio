@@ -13,7 +13,7 @@
     @if($audioEnabled ?? config('mky-captcha.audio_enabled', true))
     <div class="mky-captcha-audio-wrapper">
         <button type="button" class="mky-captcha-audio-btn" data-captcha-id="{{ $id ?? 'default' }}" title="Play Audio CAPTCHA">
-            🔊 Play Audio
+            🔊
         </button>
     </div>
     @endif
