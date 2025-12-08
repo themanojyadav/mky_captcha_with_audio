@@ -1,36 +1,39 @@
 /**
- * MkyCaptchaWithAudio JavaScript
+ * MkyCaptchaWithAudio JavaScript (Axios Version)
  * Handles CAPTCHA refresh and audio playback
  */
-
 (function () {
   "use strict";
 
   let mkyCaptchaAudioPlaying = {};
 
+  // ✅ Automatically attach CSRF to Axios
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+  if (csrfToken) {
+    axios.defaults.headers.common["X-CSRF-TOKEN"] = csrfToken;
+  }
+
+  axios.defaults.withCredentials = true;
+  axios.defaults.headers.common["Accept"] = "application/json";
+  axios.defaults.headers.common["Content-Type"] = "application/json";
+
   /**
-   * Refresh CAPTCHA image and audio
+   * ✅ Refresh CAPTCHA image and audio (AXIOS)
    */
   async function refreshMkyCaptcha(id) {
     try {
       const refreshUrl = document.querySelector(
         "[data-mky-captcha-refresh-url]"
       )?.dataset.mkyCaptchaRefreshUrl;
+
       if (!refreshUrl) {
         console.error("Refresh URL not found");
         return;
       }
-      const token = document.querySelector('meta[name="csrf-token"]')?.content;
-      const response = await fetch(refreshUrl, {
-        method: "POST", // ✅ use POST for CSRF-protected routes
-        credentials: "same-origin",
-        headers: {
-          "X-CSRF-TOKEN": token,
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await response.json();
+
+      const response = await axios.post(refreshUrl);
+
+      const data = response.data;
 
       if (data.success) {
         const imgElement = document.getElementById("mky-captcha-img-" + id);
@@ -50,12 +53,10 @@
   }
 
   /**
-   * Play CAPTCHA audio
+   * ✅ Play CAPTCHA audio sequentially
    */
   async function playMkyCaptchaAudio(id, button) {
-    if (mkyCaptchaAudioPlaying[id]) {
-      return;
-    }
+    if (mkyCaptchaAudioPlaying[id]) return;
 
     try {
       const audioElement = document.getElementById("mky-captcha-audio-" + id);
@@ -76,13 +77,14 @@
 
       for (let i = 0; i < audioData.length; i++) {
         const audio = new Audio(audioData[i]);
+
         await new Promise((resolve, reject) => {
           audio.onended = resolve;
           audio.onerror = reject;
           audio.play();
         });
 
-        // Small pause between characters
+        // ✅ Small pause between characters
         await new Promise((resolve) => setTimeout(resolve, 300));
       }
 
@@ -96,10 +98,10 @@
   }
 
   /**
-   * Initialize event listeners when DOM is ready
+   * ✅ Initialize event listeners
    */
   function initMkyCaptcha() {
-    // Handle refresh button clicks
+    // ✅ Handle refresh button
     document.addEventListener("click", function (e) {
       if (e.target.classList.contains("mky-captcha-refresh")) {
         e.preventDefault();
@@ -110,7 +112,7 @@
       }
     });
 
-    // Handle audio button clicks
+    // ✅ Handle audio button
     document.addEventListener("click", function (e) {
       if (e.target.classList.contains("mky-captcha-audio-btn")) {
         e.preventDefault();
@@ -122,14 +124,14 @@
     });
   }
 
-  // Initialize when DOM is ready
+  // ✅ DOM Ready Init
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initMkyCaptcha);
   } else {
     initMkyCaptcha();
   }
 
-  // Expose functions globally for programmatic access
+  // ✅ Expose Globally
   window.MkyCaptcha = {
     refresh: refreshMkyCaptcha,
     playAudio: function (id) {

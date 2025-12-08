@@ -174,6 +174,7 @@ class CaptchaGenerator
         $code = $this->generate($length);
 
         return [
+            'success' => true,
             'image' => $this->createImage($code),
             'audio' => $this->getAudioFiles(),
         ];

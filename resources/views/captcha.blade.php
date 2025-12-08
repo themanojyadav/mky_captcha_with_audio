@@ -24,5 +24,6 @@
 </div>
 
 @once
+<script src="{{ asset('vendor/mky-captcha/js/axios.min.js') }}"></script>
 <script src="{{ asset('vendor/mky-captcha/js/mky-captcha.js') }}"></script>
 @endonce
