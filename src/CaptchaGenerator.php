@@ -110,14 +110,20 @@ class CaptchaGenerator
     protected function addText($image, string $code, int $width, int $height): void
     {
         $textColor = config('mky-captcha.text_color', [0, 0, 0]);
-        $fontSize  = config('mky-captcha.font_size', 40); // ✅ Larger & clean
+        $fontSize  = config('mky-captcha.font_size', 40); 
         $angleMin = config('mky-captcha.angle_min', -15);
         $angleMax = config('mky-captcha.angle_max', 15);
 
         $color = sprintf('rgb(%d, %d, %d)', $textColor[0], $textColor[1], $textColor[2]);
 
-        // ✅ Correct absolute font path
+        // Resolve font path
         $fontPath = config('mky-captcha.font_path');
+        
+        // If configured path doesn't exist, try local package path
+        if (!file_exists($fontPath)) {
+            // Fallback to internal font
+            $fontPath = __DIR__ . '/../resources/fonts/roboto_variable.ttf';
+        }
 
         $codeLength = strlen($code);
         $spacing = $width / ($codeLength + 1);
@@ -128,7 +134,10 @@ class CaptchaGenerator
             $angle = random_int($angleMin, $angleMax);
 
             $image->text($code[$i], $x, $y, function ($font) use ($fontPath, $fontSize, $color, $angle) {
-                $font->file($fontPath);
+                // Ensure font file exists before using
+                if (file_exists($fontPath)) {
+                    $font->file($fontPath);
+                }
                 $font->size($fontSize);
                 $font->color($color);
                 $font->align('center');
@@ -160,7 +169,22 @@ class CaptchaGenerator
 
         for ($i = 0; $i < strlen($code); $i++) {
             $char = strtolower($code[$i]);
-            $audioFiles[] = asset("{$audioPath}/{$char}.mp3");
+            
+            // Check if public asset exists
+            $publicFile = public_path("{$audioPath}/{$char}.mp3");
+            
+            if (file_exists($publicFile)) {
+                // Return URL if file exists in public
+                $audioFiles[] = asset("{$audioPath}/{$char}.mp3");
+            } else {
+                // Fallback to Base64 using package resources
+                $localFile = __DIR__ . "/../resources/audio/{$char}.mp3";
+                
+                if (file_exists($localFile)) {
+                    $audioData = base64_encode(file_get_contents($localFile));
+                    $audioFiles[] = "data:audio/mp3;base64,{$audioData}";
+                }
+            }
         }
 
         return $audioFiles;

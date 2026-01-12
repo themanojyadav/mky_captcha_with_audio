@@ -10,10 +10,12 @@ class CaptchaServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        // Bind to the Manager class
         $this->app->singleton('mky-captcha', function ($app) {
-            return new CaptchaGenerator();
+            return new MkyCaptchaManager();
         });
 
+        // Merge config using absolute path
         $this->mergeConfigFrom(
             __DIR__ . '/config/mky-captcha.php',
             'mky-captcha'
@@ -22,7 +24,7 @@ class CaptchaServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Publish config
+        // Publish config (keep for Composer users)
         $this->publishes([
             __DIR__ . '/config/mky-captcha.php' => config_path('mky-captcha.php'),
         ], 'mky-captcha-config');
@@ -53,10 +55,13 @@ class CaptchaServiceProvider extends ServiceProvider
             __DIR__ . '/../resources/js' => public_path('vendor/mky-captcha/js'),
         ], 'mky-captcha-assets');
 
-        // Load routes
-        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+        // Load routes using absolute path
+        // Only load if file exists to be safe
+        if (file_exists(__DIR__ . '/../routes/web.php')) {
+            $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+        }
 
-        // Load views
+        // Load views using absolute path
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'mky-captcha');
 
         // Publish views
