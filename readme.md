@@ -425,7 +425,7 @@ In `config/mky-captcha.php`:
 
 ### Unit Testing
 
-```php
+````php
 namespace Tests\Feature;
 
 use Tests\TestCase;
@@ -442,6 +442,29 @@ class CaptchaTest extends TestCase
         $this->assertArrayHasKey('audio', $data);
         $this->assertStringContainsString('data:image/png;base64', $data['image']);
     }
+
+    ## Manual Installation
+
+   - **Option A (Bootstrap File):**
+     Add the following line to `bootstrap/app.php` or `public/index.php` (before request handling).
+     **This file now manually loads all required classes, so you do NOT need to run `composer dump-autoload`.**
+     ```php
+     if (file_exists(app_path('Packages/MkyCaptcha/src/bootstrap.php'))) {
+         require_once app_path('Packages/MkyCaptcha/src/bootstrap.php');
+     }
+     ```
+
+   - **Option B (AppServiceProvider):**
+     In `app/Providers/AppServiceProvider.php`, inside the `register` method:
+     ```php
+     public function register(): void
+     {
+         // This loads the classes AND registers the provider
+         if (file_exists(app_path('Packages/MkyCaptcha/src/bootstrap.php'))) {
+            require_once app_path('Packages/MkyCaptcha/src/bootstrap.php');
+         }
+     }
+     ```
 
     public function test_captcha_validation()
     {
@@ -466,7 +489,7 @@ class CaptchaTest extends TestCase
         $response->assertSessionHasErrors('captcha');
     }
 }
-```
+````
 
 ## 🛠️ Troubleshooting
 
