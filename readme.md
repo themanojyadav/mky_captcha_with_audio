@@ -443,29 +443,67 @@ class CaptchaTest extends TestCase
         $this->assertStringContainsString('data:image/png;base64', $data['image']);
     }
 
-    ## Manual Installation
+## Deployment on Restricted Servers (No Composer / NIC Server)
 
-   - **Option A (Bootstrap File):**
-     Add the following line to `bootstrap/app.php` or `public/index.php` (before request handling).
-     **This file now manually loads all required classes, so you do NOT need to run `composer dump-autoload`.**
-     ```php
-     if (file_exists(app_path('Packages/MkyCaptcha/src/bootstrap.php'))) {
-         require_once app_path('Packages/MkyCaptcha/src/bootstrap.php');
-     }
-     ```
+If you are deploying to a server like NIC where `composer` is not available and you cannot run `composer dump-autoload` or `artisan vendor:publish`, follow these exact steps:
 
-   - **Option B (AppServiceProvider):**
-     In `app/Providers/AppServiceProvider.php`, inside the `register` method:
-     ```php
-     public function register(): void
-     {
-         // This loads the classes AND registers the provider
-         if (file_exists(app_path('Packages/MkyCaptcha/src/bootstrap.php'))) {
-            require_once app_path('Packages/MkyCaptcha/src/bootstrap.php');
-         }
-     }
-     ```
+### Step 1: Prepare Locally
+1. Ensure your main local application has `intervention/image` installed:
+   ```bash
+   composer require intervention/image
+   ```
+2. Download this package and extract it (or clone it).
 
+### Step 2: Upload Files
+1. Create a directory in your project: `app/Packages/MkyCaptcha`.
+2. Upload the **entire content** of this package into that folder. Structure should look like:
+   ```
+   /var/www/html/your-project/
+   ├── app/
+   │   ├── Packages/
+   │   │   └── MkyCaptcha/
+   │   │       ├── src/
+   │   │       ├── resources/
+   │   │       ├── bootstrap.php
+   │   │       └── ...
+   ```
+
+### Step 3: Register the Package (The Key Step)
+Since you cannot run `composer dump-autoload`, you **MUST** manually require the bootstrap file which loads all classes.
+
+Open your `app/Providers/AppServiceProvider.php` and update the `register` method:
+
+```php
+public function register(): void
+{
+    // 1. Define the path to the bootstrap file
+    $captchaBootstrap = app_path('Packages/MkyCaptcha/src/bootstrap.php');
+
+    // 2. Check if file exists and require it
+    if (file_exists($captchaBootstrap)) {
+        require_once $captchaBootstrap;
+    }
+}
+```
+
+### Step 4: Clear Config Cache
+If `php artisan` commands are allowed, run:
+```bash
+php artisan config:clear
+```
+If NOT allowed, manually delete `bootstrap/cache/config.php` if it exists.
+
+### Step 5: Usage
+You can now use the package as normal in your Controllers or Views.
+
+```php
+// In a Controller
+public function refreshCaptcha() {
+    return app('mky-captcha')->refresh();
+}
+```
+
+> **Why this works:** The `src/bootstrap.php` file manually requires every class file in the correct order, bypassing the need for Composer's autoloader map updates.
     public function test_captcha_validation()
     {
         $data = MkyCaptcha::refresh();
