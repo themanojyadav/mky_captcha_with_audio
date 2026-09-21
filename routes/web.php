@@ -8,6 +8,7 @@ Route::middleware('web')
     ->name('mky-captcha.')
     ->group(function () {
 
-        Route::get('/generate', [CaptchaController::class, 'generate'])->name('generate');
-        Route::post('/refresh', [CaptchaController::class, 'refresh'])->name('refresh');
-    });
+    Route::get('/generate', [CaptchaController::class, 'generate'])->name('generate');
+    Route::post('/refresh', [CaptchaController::class, 'refresh'])->name('refresh');
+    Route::get('/audio/{token}', [CaptchaController::class, 'serveAudio'])->name('audio');
+});

@@ -122,7 +122,7 @@ class CaptchaGenerator
         // If configured path doesn't exist, try local package path
         if (!file_exists($fontPath)) {
             // Fallback to internal font
-            $fontPath = __DIR__ . '/../resources/fonts/roboto_variable.ttf';
+            $fontPath = _DIR_ . '/../resources/fonts/roboto_variable.ttf';
         }
 
         $codeLength = strlen($code);
@@ -150,6 +150,9 @@ class CaptchaGenerator
 
     /**
      * Get audio files for the current CAPTCHA
+     *
+     * Returns opaque token-based URLs instead of character-named files
+     * to prevent CAPTCHA answer leakage via audio filenames (VAPT fix).
      */
     public function getAudioFiles(): ?array
     {
@@ -166,6 +169,7 @@ class CaptchaGenerator
         $code = $sessionData['code'];
         $audioPath = config('mky-captcha.audio_path', 'vendor/mky-captcha/audio');
         $audioFiles = [];
+        $tokenMap = [];
 
         for ($i = 0; $i < strlen($code); $i++) {
             $char = strtolower($code[$i]);
@@ -174,11 +178,14 @@ class CaptchaGenerator
             $publicFile = public_path("{$audioPath}/{$char}.mp3");
             
             if (file_exists($publicFile)) {
-                // Return URL if file exists in public
-                $audioFiles[] = asset("{$audioPath}/{$char}.mp3");
+                // Generate a cryptographically random opaque token (not derived from the character)
+                $token = bin2hex(random_bytes(16));
+                $tokenMap[$token] = $char;
+                // Return opaque URL — character is never exposed
+                $audioFiles[] = url("/mky-captcha/audio/{$token}");
             } else {
-                // Fallback to Base64 using package resources
-                $localFile = __DIR__ . "/../resources/audio/{$char}.mp3";
+                // Fallback to Base64 using package resources (already safe — no filename exposed)
+                $localFile = _DIR_ . "/../resources/audio/{$char}.mp3";
                 
                 if (file_exists($localFile)) {
                     $audioData = base64_encode(file_get_contents($localFile));
@@ -186,6 +193,9 @@ class CaptchaGenerator
                 }
             }
         }
+
+        // Store token-to-character mapping in session (server-side only)
+        Session::put('mky_captcha_audio_tokens', $tokenMap);
 
         return $audioFiles;
     }
